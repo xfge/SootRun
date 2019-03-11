@@ -1,0 +1,14 @@
+-d
+/Users/gexiaofei/soot/sootOutput
+-android-jars
+/Users/gexiaofei/Library/Android/sdk/platforms
+-package
+com.choiceoflove.dating
+-process-dir
+/Users/gexiaofei/apks/com.choiceoflove.dating.apk
+-apktool-dir
+/Users/gexiaofei/apks/com.choiceoflove.dating
+-token-dir
+/Users/gexiaofei/PycharmProjects/json_handler/apk_sequences
+-process-multiple-dex
+-allow-phantom-refs

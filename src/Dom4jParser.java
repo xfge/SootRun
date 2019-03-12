@@ -1,6 +1,9 @@
 import model.LayoutTreeNode;
 import model.Widget;
-import org.dom4j.*;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import soot.Scene;
 import soot.SootClass;
@@ -34,7 +37,13 @@ public class Dom4jParser {
         return layoutTreeRoot;
     }
 
-    // 只需执行该方法
+    public Set<LayoutTreeNode> getTreeNodeSet() {
+        return treeNodeSet;
+    }
+
+    /***
+     * 该方法中包含了读取XML、分析SOOT结果、制作token序列等过程
+     */
     public void parse() {
         File file = new File(fp);
         SAXReader saxReader = new SAXReader();
@@ -42,23 +51,26 @@ public class Dom4jParser {
             Document document = saxReader.read(file);
 
             layoutTreeRoot = treeWalk(document);
-            setAncestorsForNodes();
+            setAllNodesAncestors();
             setAllNodesTypes(); // 由 SOOT 补充完整信息后再执行
             makeTokens();
 
         } catch (DocumentException e) {
-            logger.severe(e.toString() + " XML file parsing failed.");
+            logger.severe(e.toString() + " XML file parsing failed: " + fp);
         }
     }
 
     public void setAllNodesTypes() {
         for (LayoutTreeNode node : treeNodeSet) {
-//            System.out.println("[INFO] " + node.getClassName() + " ancestors: " + node.getAncestors());
-            node.setType(inferWidgetType(node).toString());
+            Widget inferredWidgetType = inferWidgetType(node);
+            node.setType(inferredWidgetType.toString());
         }
     }
 
-    public void setAncestorsForNodes() {
+    /***
+     * 根据 Soot 运行结果为
+     */
+    public void setAllNodesAncestors() {
         for (LayoutTreeNode node : getTreeNodeSet()) {
             String className = node.getClassName();
             if (Scene.v().containsClass(className)) {
@@ -96,15 +108,14 @@ public class Dom4jParser {
         return treeWalk(rootElement, null);
     }
 
-    public Set<LayoutTreeNode> getTreeNodeSet() {
-        return treeNodeSet;
-    }
-
     private LayoutTreeNode treeWalk(Element element, LayoutTreeNode parent) {
         if (element.getName().equals("include")) {
             String attrValue = element.attribute("layout").getValue();
             if (attrValue.startsWith("@layout/")) {
-                String includedLayoutPath = fp.substring(0, fp.lastIndexOf('/') + 1) + attrValue.substring(8) + ".xml";
+                // <include layout="@layout/xxx" />
+                // fixme: 这里没有考虑不同平台路径分隔符
+                String includedLayoutPath = fp.substring(0, fp.lastIndexOf('\\') + 1) + attrValue.substring(8) + ".xml";
+                System.out.println(attrValue);
                 Dom4jParser parser = new Dom4jParser(includedLayoutPath);
                 parser.parse();
                 LayoutTreeNode includedRoot = parser.getLayoutTreeRoot();
@@ -116,22 +127,21 @@ public class Dom4jParser {
                 logger.severe("Unhandled attribute of <include> tag: " + attrValue);
             }
         } else if (element.getName().equals("view")) {
-            logger.severe("[TODO] Unhandled attribute of <view> tag.");
+            logger.info("[TODO] Unhandled attribute of <view> tag.");
         } else if (element.getName().equals("merge")) {
-            logger.severe("[TODO] Unhandled attribute of <merge> tag.");
+            logger.info("[TODO] Unhandled attribute of <merge> tag.");
         } else if (element.getName().equals("fragment")) {
-            logger.severe("[TODO] Unhandled attribute of <fragment> tag.");
+            logger.info("[TODO] Unhandled attribute of <fragment> tag.");
         } else {
             LayoutTreeNode currentNode = new LayoutTreeNode();
-
             currentNode.setClassName(inferClassName(element.getName()));
-
             Attribute idAttribute = element.attribute("id");
             if (idAttribute != null) {
                 if (idAttribute.getNamespacePrefix().equals("android") && idAttribute.getValue().startsWith("@id/")) {
                     currentNode.setId(idAttribute.getValue().substring(4));
                 } else {
-                    logger.severe("[TODO] Unhandled 'id' attribute: " + idAttribute.getNamespace() + ":" + idAttribute.getName() + "=" + idAttribute.getValue());
+                    // 未获取到标准化控件 id
+                    logger.info("[TODO] Unhandled 'id' attribute: " + idAttribute.getNamespace() + ":" + idAttribute.getName() + "=" + idAttribute.getValue());
                 }
             }
 
@@ -170,59 +180,76 @@ public class Dom4jParser {
         }
     }
 
-    private Widget inferWidgetType(LayoutTreeNode node) {
-        String firstStdClass = null;
-        if (node.getClassName().startsWith("android.widget") || node.getClassName().equals("android.view.View")) {
-            firstStdClass = node.getClassName();
-        } else {
-            if (node.getAncestors() != null) {
-                for (String ancestor : node.getAncestors()) {
-                    if (ancestor.startsWith("android.widget")) {
-                        firstStdClass = ancestor;
-                        break;
-                    }
-                }
+    private String getStdClassName(String clz, List<String> ancestors) {
+        if (clz.startsWith("android.widget") || clz.equals("android.support.v7.widget.Toolbar") ||
+                clz.equals("android.support.v7.widget.RecyclerView") || clz.equals("android.view.View")) {
+            return clz;
+        }
+        for (String ancestor : ancestors) {
+            if (ancestor.startsWith("android.widget") || ancestor.equals("android.support.v7.widget.Toolbar") ||
+                    ancestor.equals("android.support.v7.widget.RecyclerView") || ancestor.equals("android.view.View")) {
+                return ancestor;
             }
         }
-        if (node.getAncestors() == null) {
-            logger.severe("[WARNING] ancestors not retrieved. " + node.getClassName());
-            return Widget.Unclassified;
-        }
-        if (node.getAncestors().contains("android.widget.AdapterView")) {
-            // TODO 单独处理List类型
-            return Widget.Layout;
-        }
-        if (node.getAncestors().contains("android.view.ViewGroup")) {
-            return Widget.Layout;
-        }
-        if (firstStdClass == null) {
-            logger.severe("[WARNING] No first standard android.widget class. " + node.getClassName() + " " + node.getAncestors());
-            return Widget.Unclassified;
-        }
-        switch (firstStdClass) {
-            case "android.widget.TextView":
-            case "android.widget.CheckedTextView":
-                return Widget.TextView;
-            case "android.widget.ImageView":
-                return Widget.ImageView;
+        return null;
+    }
+
+    private Widget inferWidgetTypeFromStdClass(String stdClassName) {
+        switch (stdClassName) {
+            case "android.view.View":
+                return Widget.Unclassified;
+            case "android.support.v7.widget.Toolbar":
+                return Widget.Toolbar;
+            case "android.support.v7.widget.RecyclerView":
+            case "android.widget.AdapterView":
+            case "android.widget.ListView":
+                return Widget.List;
+            case "android.widget.ToggleButton":
+            case "android.widget.Switch":
+                return Widget.Switch;
+            case "android.widget.RadioButton":
+                return Widget.RadioButton;
             case "android.widget.ImageButton":
             case "android.widget.Button":
             case "android.widget.CompoundButton":
                 return Widget.Button;
+            case "android.widget.CheckBox":
+            case "android.widget.CheckedTextView":
+                return Widget.CheckBox;
+            case "android.widget.ImageView":
+                return Widget.ImageView;
             case "android.widget.EditText":
             case "android.widget.AutoCompleteTextView":
             case "android.widget.MultiAutoCompleteTextView":
                 return Widget.EditText;
-            case "android.widget.CheckBox":
-                return Widget.CheckBox;
-            case "android.widget.RadioButton":
-                return Widget.RadioButton;
-            case "android.widget.ToggleButton":
-            case "android.widget.Switch":
-                return Widget.Switch;
+            case "android.widget.TextView":
+                return Widget.TextView;
             default:
-                logger.info(firstStdClass + " not supported.");
+                logger.info(stdClassName + " not supported.");
                 return Widget.Unclassified;
         }
+    }
+
+    private Widget inferWidgetType(LayoutTreeNode node) {
+        List<String> ancestors = node.getAncestors();
+        String firstStdClass = getStdClassName(node.getClassName(), ancestors);
+
+        if (ancestors == null) {
+            logger.severe("[WARNING] ancestors not retrieved. " + node.getClassName());
+        } else {
+            if (ancestors.contains("android.widget.AdapterView")) {
+                return Widget.List;
+            }
+            if (ancestors.contains("android.view.ViewGroup")) {
+                return Widget.Layout;
+            }
+        }
+
+        if (firstStdClass == null) {
+            logger.severe("[WARNING] No first standard Android widget class. " + node.getClassName() + " " + node.getAncestors());
+            return Widget.Unclassified;
+        }
+
+        return inferWidgetTypeFromStdClass(firstStdClass);
     }
 }

@@ -8,6 +8,13 @@ public class LayoutTreeNode {
     private String className;
     private String type;
     private boolean clickable;
+    private List<String> ancestors;
+    private List<LayoutTreeNode> children;
+
+    public LayoutTreeNode() {
+        children = new ArrayList<>();
+    }
+
 
     public boolean isClickable() {
         return clickable;
@@ -15,13 +22,6 @@ public class LayoutTreeNode {
 
     public void setClickable(boolean clickable) {
         this.clickable = clickable;
-    }
-
-    private List<String> ancestors;
-    private List<LayoutTreeNode> children;
-
-    public LayoutTreeNode() {
-        children = new ArrayList<>();
     }
 
     public String getType() {

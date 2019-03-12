@@ -1,16 +1,18 @@
-import soot.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.ParseException;
+import soot.PackManager;
+import soot.Transform;
 import soot.options.Options;
+import utils.ExtendedDefaultParser;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
-
-import org.apache.commons.cli.*;
 
 
 public class Main {
@@ -48,34 +50,23 @@ public class Main {
         soot.Main.main(cliParser.getNotParsedArgs());
 
         System.out.println("process_dir: " + Options.v().process_dir());
-        System.out.println("soot classes: " + Scene.v().getClasses());
+//        System.out.println("soot classes: " + Scene.v().getClasses());
         System.out.println("------------\nvalid layout: " + vlr.getValidLayoutFileName());
 
-
-//        for (String fn : vlr.getValidLayoutFileName()) {
-//            System.out.println("------------\nactivity id: " + fn + ".xml");
-//            Dom4jParser parser = new Dom4jParser("/Users/gexiaofei/apks/" + packageName + "/res/layout", fn);
-//            parser.parse();
-//
-////            for (model.LayoutTreeNode node : parser.getTreeNodeSet()) {
-//////                System.out.println(node.getClassName() + ": " + node.getAncestors());
-//////            }
-//
-//            System.out.println("tokens: " + String.join(" ", parser.getTokens()));
-//        }
-
-        File folder = new File(apktool_dir + "/res/layout");
+        // 开始解析 res/layout 下的每个文件
+        File folder = new File(apktool_dir + "\\res\\layout");
         File[] files = folder.listFiles();
         if (files != null) {
             System.out.println(files.length + " layout files read from APK start processing ...");
             try {
-                Path path = Paths.get( token_files_dir + "/" + package_name + "-layout.lst");
+                Path path = Paths.get(token_files_dir + "\\" + package_name + "-layout.lst");
                 Files.deleteIfExists(path);
                 Files.createFile(path);
                 for (File f : files) {
                     if (f.isFile()) {
                         Dom4jParser parser = new Dom4jParser(f.getAbsolutePath());
                         parser.parse();
+
                         List<String> tokens = parser.getTokens();
                         if (tokens.size() > 5) {
                             System.out.println("[TOKENS] " + f.getName() + " " + String.join(" ", tokens));

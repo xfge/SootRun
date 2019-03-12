@@ -1,3 +1,5 @@
+package utils;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
@@ -16,7 +18,7 @@ public class ExtendedDefaultParser extends DefaultParser {
     @Override
     public CommandLine parse(Options options, String[] arguments, boolean stopAtNonOption) throws ParseException {
 
-        if(stopAtNonOption) {
+        if (stopAtNonOption) {
             return parse(options, arguments);
         }
         List<String> knownArguments = new ArrayList<>();

@@ -72,12 +72,12 @@ public class Main {
                             System.out.println("[TOKENS] " + f.getName() + " " + String.join(" ", tokens));
                             boolean isLayout = f.getName().contains("fragment") || f.getName().contains("activity");
                             boolean isListItem = f.getName().contains("item") || f.getName().contains("row");
-                            if (isLayout) {
-                                Files.write(path, (package_name + " 1 " + f.getName() + " " + String.join(" ", tokens) + "\n").getBytes(), StandardOpenOption.APPEND);
-                            }
                             if (isListItem) {
                                 Files.write(path, (package_name + " 2 " + f.getName() + " " + String.join(" ", tokens) + "\n").getBytes(), StandardOpenOption.APPEND);
+                            } else if (isLayout) {
+                                Files.write(path, (package_name + " 1 " + f.getName() + " " + String.join(" ", tokens) + "\n").getBytes(), StandardOpenOption.APPEND);
                             }
+
                         }
                     }
                 }

@@ -115,7 +115,7 @@ public class Dom4jParser {
                 // <include layout="@layout/xxx" />
                 // fixme: 这里没有考虑不同平台路径分隔符
                 String includedLayoutPath = fp.substring(0, fp.lastIndexOf('\\') + 1) + attrValue.substring(8) + ".xml";
-                System.out.println(attrValue);
+//                System.out.println(attrValue);
                 Dom4jParser parser = new Dom4jParser(includedLayoutPath);
                 parser.parse();
                 LayoutTreeNode includedRoot = parser.getLayoutTreeRoot();
@@ -237,7 +237,8 @@ public class Dom4jParser {
         if (ancestors == null) {
             logger.severe("[WARNING] ancestors not retrieved. " + node.getClassName());
         } else {
-            if (ancestors.contains("android.widget.AdapterView")) {
+            if (firstStdClass != null && (firstStdClass.equals("android.support.v7.widget.RecyclerView") || firstStdClass.equals("android.widget.ListView")) ||
+                    ancestors.contains("android.widget.AdapterView")) {
                 return Widget.List;
             }
             if (ancestors.contains("android.view.ViewGroup")) {

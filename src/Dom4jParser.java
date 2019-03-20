@@ -145,7 +145,10 @@ public class Dom4jParser {
                 }
             }
 
-            currentNode.setClickable(element.attribute("onClick") != null);
+            currentNode.setClickable(element.attribute("android:onClick") != null);
+            if (element.attribute("android:onClick") != null) {
+                System.out.println(element.attribute("android:onClick"));
+            }
 
             // 递归遍历
             for (Iterator<Element> it = element.elementIterator(); it.hasNext(); ) {
@@ -238,7 +241,7 @@ public class Dom4jParser {
             logger.severe("[WARNING] ancestors not retrieved. " + node.getClassName());
         } else {
             if (firstStdClass != null && (firstStdClass.equals("android.support.v7.widget.RecyclerView") || firstStdClass.equals("android.widget.ListView")) ||
-                    ancestors.contains("android.widget.AdapterView")) {
+                    ancestors.contains("android.widget.AbsListView")) {
                 return Widget.List;
             }
             if (ancestors.contains("android.view.ViewGroup")) {
@@ -251,6 +254,7 @@ public class Dom4jParser {
             return Widget.Unclassified;
         }
 
-        return inferWidgetTypeFromStdClass(firstStdClass);
+        Widget inferredType = inferWidgetTypeFromStdClass(firstStdClass);
+        return inferredType;
     }
 }

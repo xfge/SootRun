@@ -12,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -57,9 +56,8 @@ public class Main {
                 Files.deleteIfExists(tokenFilePath);
                 Files.createFile(tokenFilePath);
 
-                List<byte[]> itemBytes = new ArrayList<>();
-                List<byte[]> layoutBytes = new ArrayList<>();
-
+                StringBuilder itemsb = new StringBuilder();
+                StringBuilder layoutsb = new StringBuilder();
                 for (File f : files) {
                     if (f.isFile()) {
                         // 打开每个文件进行解析，解析结果为 tokens
@@ -75,21 +73,17 @@ public class Main {
                             boolean shouldExclude = fileName.startsWith("abc_") || fileName.startsWith("preference_") || fileName.startsWith("date_picker_") || fileName.startsWith("time_picker_") || fileName.startsWith("select_dialog_") || fileName.startsWith("support_simple_spinner_dropdown_item");
                             if (!shouldExclude) {
                                 if (isListItem) {
-                                    itemBytes.add((package_name + " 2 " + fileName + " " + String.join(" ", tokens) + "\n").getBytes());
+                                    itemsb.append(package_name).append(" 2 ").append(fileName).append(" ").append(String.join(" ", tokens)).append("\n");
                                 } else if (isLayout) {
-                                    layoutBytes.add((package_name + " 1 " + fileName + " " + String.join(" ", tokens) + "\n").getBytes());
+                                    layoutsb.append(package_name).append(" 1 ").append(fileName).append(" ").append(String.join(" ", tokens)).append("\n");
                                 }
                             }
                         }
                     }
                 }
 
-                for (byte[] itemByte : itemBytes) {
-                    Files.write(tokenFilePath, itemByte, StandardOpenOption.APPEND);
-                }
-                for (byte[] layoutByte : layoutBytes) {
-                    Files.write(tokenFilePath, layoutByte, StandardOpenOption.APPEND);
-                }
+                Files.write(tokenFilePath, itemsb.toString().getBytes(), StandardOpenOption.APPEND);
+                Files.write(tokenFilePath, layoutsb.toString().getBytes(), StandardOpenOption.APPEND);
 
                 System.out.println("Output saved in " + tokenPath);
             } catch (IOException e) {
@@ -118,9 +112,11 @@ public class Main {
 //        System.out.println("soot classes: " + Scene.v().getClasses());
 //        System.out.println("------------\nvalid layout: " + vlr.getValidLayoutFileName());
 
+        long startTime = System.currentTimeMillis();
         writeTokensFile(apktool_dir + "/res/layout",
                 token_files_dir + "/" + package_name + "-layout.lst");
-
+        long endTime = System.currentTimeMillis();
+        System.out.println("Writing files time：" + (endTime - startTime) + "ms");
 
     }
 

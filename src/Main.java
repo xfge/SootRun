@@ -113,8 +113,8 @@ public class Main {
 //        System.out.println("------------\nvalid layout: " + vlr.getValidLayoutFileName());
 
         long startTime = System.currentTimeMillis();
-        writeTokensFile(apktool_dir + "/res/layout",
-                token_files_dir + "/" + package_name + "-layout.lst");
+        writeTokensFile(apktool_dir + File.separator + "res" + File.separator + "layout",
+                token_files_dir + File.separator + package_name + "-layout.lst");
         long endTime = System.currentTimeMillis();
         System.out.println("Writing files time：" + (endTime - startTime) + "ms");
 

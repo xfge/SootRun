@@ -2,7 +2,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
 import soot.PackManager;
-import soot.Scene;
 import soot.Transform;
 import soot.options.Options;
 import utils.ExtendedDefaultParser;
@@ -114,7 +113,7 @@ public class Main {
         soot.Main.main(cliParser.getNotParsedArgs());
 
         System.out.println("process_dir: " + Options.v().process_dir());
-        System.out.println("soot classes: " + Scene.v().getClasses());
+//        System.out.println("soot classes: " + Scene.v().getClasses());
 //        System.out.println("------------\nvalid layout: " + vlr.getValidLayoutFileName());
 
         long startTime = System.currentTimeMillis();

@@ -191,10 +191,12 @@ class Dom4jParser {
                 clz.equals("android.support.v7.widget.RecyclerView") || clz.equals("android.view.View")) {
             return clz;
         }
-        for (String ancestor : ancestors) {
-            if (ancestor.startsWith("android.widget") || ancestor.equals("android.support.v7.widget.Toolbar") ||
-                    ancestor.equals("android.support.v7.widget.RecyclerView") || ancestor.equals("android.view.View")) {
-                return ancestor;
+        if (ancestors != null) {
+            for (String ancestor : ancestors) {
+                if (ancestor.startsWith("android.widget") || ancestor.equals("android.support.v7.widget.Toolbar") ||
+                        ancestor.equals("android.support.v7.widget.RecyclerView") || ancestor.equals("android.view.View")) {
+                    return ancestor;
+                }
             }
         }
         return null;
@@ -239,38 +241,32 @@ class Dom4jParser {
     private Widget inferWidgetType(LayoutTreeNode node) {
         List<String> ancestors = node.getAncestors();
 
-        // 未获取到祖先的控件类
-        if (ancestors == null) {
-            if (node.getChildren() != null && node.getChildren().size() > 0) {
-                logger.info("A container widget whose ancestors are not retrieved, set as Layout. (class name:" + node.getClassName() + ")");
-                return Widget.Layout;
-            } else {
-                logger.severe("A leaf widget whose ancestors are not retrieved. (class name: " + node.getClassName() + ")");
-                return Widget.Unclassified;
-            }
-        }
-
-        // 根据类名和祖先类名判断官方控件类
+        // 根据类名和祖先类名判断官方控件类，输入可能为 null，结果可能为 null
         String firstStdClass = getStdClassName(node.getClassName(), ancestors);
-        if (firstStdClass == null) {
-            logger.severe("No first standard Android widget class. (class name: " + node.getClassName() + ", ancestors: " + node.getAncestors() + ")");
-            return Widget.Unclassified;
+
+        if (firstStdClass != null) {
+            // 根据官方控件类判断控件类型
+            Widget inferredType = inferWidgetTypeFromStdClass(firstStdClass);
+            if (inferredType != Widget.Unclassified) {
+                return inferredType;
+            }
         }
 
-        // 根据官方控件类判断控件类型
-        Widget inferredType = inferWidgetTypeFromStdClass(firstStdClass);
+        if (node.getChildren() != null && node.getChildren().size() > 0) {
+            logger.info("A container widget whose ancestors are not retrieved, set as Layout. (class name:" + node.getClassName() + ")");
+            return Widget.Layout;
+        }
 
-        // 给无法判断的控件进一步归类
-        if (inferredType == Widget.Unclassified) {
-            if (ancestors.contains("android.widget.AbsListView")) {
-                return Widget.List;
-            }
+        if (ancestors != null) {
             if (ancestors.contains("android.view.ViewGroup")) {
                 return Widget.Layout;
             }
-
+            if (ancestors.contains("android.widget.AbsListView")) {
+                return Widget.List;
+            }
         }
 
-        return inferredType;
+        return Widget.Unclassified;
+
     }
 }

@@ -13,9 +13,9 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Dom4jParser {
+class Dom4jParser {
 
-    Logger logger = Logger.getLogger(Dom4jParser.class.toString());
+    private Logger logger = Logger.getLogger(Dom4jParser.class.toString());
 
     private final String fp;
     private List<String> tokens;
@@ -64,11 +64,16 @@ public class Dom4jParser {
         for (LayoutTreeNode node : treeNodeSet) {
             Widget inferredWidgetType = inferWidgetType(node);
             node.setType(inferredWidgetType.toString());
+
+            // 如果一个 Toolbar 节点有子节点，删除所有子节点。
+            if (inferredWidgetType == Widget.Toolbar && node.getChildren().size() > 0) {
+                node.removeAllChildren();
+            }
         }
     }
 
     /***
-     * 根据 Soot 运行结果为
+     * 根据 Soot 运行结果为每个控件节点设置祖先属性
      */
     public void setAllNodesAncestors() {
         for (LayoutTreeNode node : getTreeNodeSet()) {
@@ -113,9 +118,7 @@ public class Dom4jParser {
             String attrValue = element.attribute("layout").getValue();
             if (attrValue.startsWith("@layout/")) {
                 // <include layout="@layout/xxx" />
-                // fixme: 这里没有考虑不同平台路径分隔符
                 String includedLayoutPath = fp.substring(0, fp.lastIndexOf(File.separator) + 1) + attrValue.substring(8) + ".xml";
-//                System.out.println(attrValue);
                 Dom4jParser parser = new Dom4jParser(includedLayoutPath);
                 parser.parse();
                 LayoutTreeNode includedRoot = parser.getLayoutTreeRoot();
@@ -135,6 +138,8 @@ public class Dom4jParser {
         } else {
             LayoutTreeNode currentNode = new LayoutTreeNode();
             currentNode.setClassName(inferClassName(element.getName()));
+
+            // 获取控件 ID
             Attribute idAttribute = element.attribute("id");
             if (idAttribute != null) {
                 if (idAttribute.getNamespacePrefix().equals("android") && idAttribute.getValue().startsWith("@id/")) {
@@ -145,10 +150,8 @@ public class Dom4jParser {
                 }
             }
 
+            // 获取点击事件
             currentNode.setClickable(element.attribute("android:onClick") != null);
-            if (element.attribute("android:onClick") != null) {
-                System.out.println(element.attribute("android:onClick"));
-            }
 
             // 递归遍历
             for (Iterator<Element> it = element.elementIterator(); it.hasNext(); ) {
@@ -235,26 +238,37 @@ public class Dom4jParser {
 
     private Widget inferWidgetType(LayoutTreeNode node) {
         List<String> ancestors = node.getAncestors();
-        String firstStdClass = getStdClassName(node.getClassName(), ancestors);
 
+        // 未获取到祖先的控件类
+        if (ancestors == null) {
+            if (node.getChildren() != null && node.getChildren().size() > 0) {
+                logger.info("A container widget whose ancestors are not retrieved, set as Layout. (class name:" + node.getClassName() + ")");
+                return Widget.Layout;
+            } else {
+                logger.severe("A leaf widget whose ancestors are not retrieved. (class name: " + node.getClassName() + ")");
+                return Widget.Unclassified;
+            }
+        }
+
+        // 根据类名和祖先类名判断官方控件类
+        String firstStdClass = getStdClassName(node.getClassName(), ancestors);
         if (firstStdClass == null) {
-            logger.severe("[WARNING] No first standard Android widget class. " + node.getClassName() + " " + node.getAncestors());
+            logger.severe("No first standard Android widget class. (class name: " + node.getClassName() + ", ancestors: " + node.getAncestors() + ")");
             return Widget.Unclassified;
         }
 
+        // 根据官方控件类判断控件类型
         Widget inferredType = inferWidgetTypeFromStdClass(firstStdClass);
 
-        if (inferredType == Widget.Unclassified && ancestors != null) {
-            if (ancestors.contains("android.view.ViewGroup")) {
-                return Widget.Layout;
-            }
+        // 给无法判断的控件进一步归类
+        if (inferredType == Widget.Unclassified) {
             if (ancestors.contains("android.widget.AbsListView")) {
                 return Widget.List;
             }
-        }
+            if (ancestors.contains("android.view.ViewGroup")) {
+                return Widget.Layout;
+            }
 
-        if (ancestors == null) {
-            logger.severe("[WARNING] ancestors not retrieved. " + node.getClassName());
         }
 
         return inferredType;

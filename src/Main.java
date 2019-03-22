@@ -69,8 +69,12 @@ public class Main {
                         if (tokens.size() > 5) {
 //                            System.out.println("[TOKENS] " + fileName + " " + String.join(" ", tokens));
                             boolean isLayout = fileName.contains("fragment") || fileName.contains("activity");
-                            boolean isListItem = fileName.contains("item") || fileName.contains("row");
-                            boolean shouldExclude = fileName.startsWith("abc_") || fileName.startsWith("preference_") || fileName.startsWith("date_picker_") || fileName.startsWith("time_picker_") || fileName.startsWith("select_dialog_") || fileName.startsWith("support_simple_spinner_dropdown_item");
+                            boolean isListItem = fileName.startsWith("item_") || fileName.endsWith("_item") || fileName.contains("_item_") ||
+                                    fileName.startsWith("row_") || fileName.endsWith("_row") || fileName.contains("_row_") ||
+                                    fileName.startsWith("card_") || fileName.endsWith("_card");
+                            boolean shouldExclude = fileName.startsWith("abc_") || fileName.startsWith("preference_") || fileName.startsWith("notification_") ||
+                                    fileName.startsWith("date_picker_") || fileName.startsWith("time_picker_") || fileName.startsWith("select_dialog_") || fileName.startsWith("support_simple_spinner_dropdown_item");
+
                             if (!shouldExclude) {
                                 if (isListItem) {
                                     itemsb.append(package_name).append(" 2 ").append(fileName).append(" ").append(String.join(" ", tokens)).append("\n");

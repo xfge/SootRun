@@ -63,4 +63,8 @@ public class LayoutTreeNode {
     public void addChild(LayoutTreeNode child) {
         children.add(child);
     }
+
+    public void removeAllChildren() {
+        children.clear();
+    }
 }

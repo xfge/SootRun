@@ -69,9 +69,9 @@ public class Main {
                         if (tokens.size() > 5) {
 //                            System.out.println("[TOKENS] " + fileName + " " + String.join(" ", tokens));
                             boolean isLayout = fileName.contains("fragment") || fileName.contains("activity");
-                            boolean isListItem = fileName.startsWith("item_") || fileName.endsWith("_item") || fileName.contains("_item_") ||
-                                    fileName.startsWith("row_") || fileName.endsWith("_row") || fileName.contains("_row_") ||
-                                    fileName.startsWith("card_") || fileName.endsWith("_card");
+                            boolean isListItem = fileName.startsWith("item_") || fileName.endsWith("_item.xml") || fileName.contains("_item_") ||
+                                    fileName.startsWith("row_") || fileName.endsWith("_row.xml") || fileName.contains("_row_") ||
+                                    fileName.startsWith("card_") || fileName.endsWith("_card.xml");
                             boolean shouldExclude = fileName.startsWith("abc_") || fileName.startsWith("preference_") || fileName.startsWith("notification_") ||
                                     fileName.startsWith("date_picker_") || fileName.startsWith("time_picker_") || fileName.startsWith("select_dialog_") || fileName.startsWith("support_simple_spinner_dropdown_item");
 

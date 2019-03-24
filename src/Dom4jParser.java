@@ -63,6 +63,7 @@ class Dom4jParser {
     public void setAllNodesTypes() {
         for (LayoutTreeNode node : treeNodeSet) {
             Widget inferredWidgetType = inferWidgetType(node);
+//            System.out.println(node.getClassName() + " " + node.getAncestors());
             node.setType(inferredWidgetType.toString());
 
             // 如果一个 Toolbar 节点有子节点，删除所有子节点。
@@ -186,15 +187,22 @@ class Dom4jParser {
         }
     }
 
+    private boolean isStdClass(String clz) {
+        return clz.startsWith("android.widget") || clz.equals("android.view.View") ||
+                clz.equals("android.support.v7.widget.Toolbar") ||
+                clz.equals("androidx.appcompat.widget.Toolbar") ||
+                clz.equals("android.support.v7.widget.RecyclerView") ||
+                clz.equals("androidx.recyclerview.widget.RecyclerView") ||
+                clz.equals("androidx.appcompat.widget.SwitchCompat");
+    }
+
     private String getStdClassName(String clz, List<String> ancestors) {
-        if (clz.startsWith("android.widget") || clz.equals("android.support.v7.widget.Toolbar") ||
-                clz.equals("android.support.v7.widget.RecyclerView") || clz.equals("android.view.View")) {
+        if (isStdClass(clz)) {
             return clz;
         }
         if (ancestors != null) {
             for (String ancestor : ancestors) {
-                if (ancestor.startsWith("android.widget") || ancestor.equals("android.support.v7.widget.Toolbar") ||
-                        ancestor.equals("android.support.v7.widget.RecyclerView") || ancestor.equals("android.view.View")) {
+                if (isStdClass(ancestor)) {
                     return ancestor;
                 }
             }
@@ -207,13 +215,16 @@ class Dom4jParser {
             case "android.view.View":
                 return Widget.Unclassified;
             case "android.support.v7.widget.Toolbar":
+            case "androidx.appcompat.widget.Toolbar":
                 return Widget.Toolbar;
             case "android.support.v7.widget.RecyclerView":
             case "android.widget.AbsListView":
             case "android.widget.ListView":
+            case "androidx.recyclerview.widget.RecyclerView":
                 return Widget.List;
             case "android.widget.ToggleButton":
             case "android.widget.Switch":
+            case "androidx.appcompat.widget.SwitchCompat":
                 return Widget.Switch;
             case "android.widget.RadioButton":
                 return Widget.RadioButton;

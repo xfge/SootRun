@@ -62,18 +62,21 @@ public class Main {
                     if (f.isFile()) {
                         // 打开每个文件进行解析，解析结果为 tokens
                         String fileName = f.getName();
+                        String fileNameLower = fileName.toLowerCase();
                         Dom4jParser parser = new Dom4jParser(f.getAbsolutePath());
                         parser.parse();
                         List<String> tokens = parser.getTokens();
 
                         if (tokens.size() > 5) {
-//                            System.out.println("[TOKENS] " + fileName + " " + String.join(" ", tokens));
-                            boolean isLayout = fileName.contains("fragment") || fileName.contains("activity");
-                            boolean isListItem = fileName.startsWith("item_") || fileName.endsWith("_item.xml") || fileName.contains("_item_") ||
-                                    fileName.startsWith("row_") || fileName.endsWith("_row.xml") || fileName.contains("_row_") ||
-                                    fileName.startsWith("card_") || fileName.endsWith("_card.xml");
-                            boolean shouldExclude = fileName.startsWith("abc_") || fileName.startsWith("preference_") || fileName.startsWith("notification_") ||
-                                    fileName.startsWith("date_picker_") || fileName.startsWith("time_picker_") || fileName.startsWith("select_dialog_") || fileName.startsWith("support_simple_spinner_dropdown_item");
+                            boolean isLayout = fileNameLower.contains("fragment") || fileNameLower.contains("activity");
+                            boolean isListItem = fileNameLower.startsWith("item_") || fileNameLower.endsWith("_item.xml") || fileNameLower.contains("_item_") ||
+                                    fileNameLower.startsWith("row_") || fileNameLower.endsWith("_row.xml") || fileNameLower.contains("_row_") ||
+                                    fileNameLower.startsWith("card_") || fileNameLower.endsWith("_card.xml") || fileNameLower.contains("_card_") ||
+                                    fileNameLower.startsWith("cardview_") || fileNameLower.endsWith("_cardview.xml") || fileNameLower.contains("_cardview_") ||
+                                    fileNameLower.startsWith("listitem_") || fileNameLower.endsWith("_listitem.xml") || fileNameLower.contains("_listitem_");
+                            boolean shouldExclude = fileNameLower.startsWith("abc_") || fileNameLower.startsWith("preference_") || fileNameLower.startsWith("notification_") ||
+                                    fileNameLower.startsWith("date_picker_") || fileNameLower.startsWith("time_picker_") || fileNameLower.startsWith("select_dialog_") ||
+                                    fileNameLower.startsWith("support_simple_spinner_dropdown_item");
 
                             if (!shouldExclude) {
                                 if (isListItem) {

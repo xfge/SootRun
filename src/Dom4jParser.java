@@ -67,7 +67,7 @@ class Dom4jParser {
             node.setType(inferredWidgetType.toString());
 
             // 如果一个 Toolbar 节点有子节点，删除所有子节点。
-            if (inferredWidgetType == Widget.Toolbar && node.getChildren().size() > 0) {
+            if (inferredWidgetType != Widget.Layout && inferredWidgetType != Widget.List && node.getChildren().size() > 0) {
                 node.removeAllChildren();
             }
         }
@@ -193,7 +193,8 @@ class Dom4jParser {
                 clz.equals("androidx.appcompat.widget.Toolbar") ||
                 clz.equals("android.support.v7.widget.RecyclerView") ||
                 clz.equals("androidx.recyclerview.widget.RecyclerView") ||
-                clz.equals("androidx.appcompat.widget.SwitchCompat");
+                clz.equals("androidx.appcompat.widget.SwitchCompat") ||
+                clz.equals("android.support.v7.widget.SwitchCompat");
     }
 
     private String getStdClassName(String clz, List<String> ancestors) {
@@ -224,6 +225,7 @@ class Dom4jParser {
                 return Widget.List;
             case "android.widget.ToggleButton":
             case "android.widget.Switch":
+            case "android.support.v7.widget.SwitchCompat":
             case "androidx.appcompat.widget.SwitchCompat":
                 return Widget.Switch;
             case "android.widget.RadioButton":

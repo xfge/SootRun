@@ -1,8 +1,6 @@
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
-import soot.PackManager;
-import soot.Transform;
 import soot.options.Options;
 import utils.ExtendedDefaultParser;
 
@@ -108,11 +106,11 @@ public class Main {
         Options.v().set_src_prec(Options.src_prec_apk); // -src-prec apk
         Options.v().set_output_format(Options.output_format_jimple); //-f J
 
-        LayoutRetriever vlr = new LayoutRetriever(package_name);
-        PackManager.v().getPack("jtp").add(
-                new Transform("jtp.myInstrumenter", vlr));
+//        LayoutRetriever vlr = new LayoutRetriever(package_name);
+//        PackManager.v().getPack("jtp").add(
+//                new Transform("jtp.myInstrumenter", vlr));
 
-        // Soot starts here, other classes
+        // Soot starts here
         soot.Main.main(cliParser.getNotParsedArgs());
 
         System.out.println("process_dir: " + Options.v().process_dir());

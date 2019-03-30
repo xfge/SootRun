@@ -100,7 +100,6 @@ public class Main {
     public static void main(String[] args) {
 
         ExtendedDefaultParser cliParser = new ExtendedDefaultParser();
-
         commandParser(cliParser, args);
 
         Options.v().set_src_prec(Options.src_prec_apk); // -src-prec apk

@@ -1,7 +1,7 @@
+package utils;
+
 import soot.*;
 import soot.jimple.*;
-import soot.jimple.internal.JVirtualInvokeExpr;
-import soot.jimple.internal.JimpleLocal;
 import soot.tagkit.Tag;
 
 import java.math.BigInteger;
@@ -18,7 +18,7 @@ public class LayoutRetriever extends BodyTransformer {
     private Map<Integer, String> layoutIdMap;
     private List<Integer> validLayoutValueList;
 
-    LayoutRetriever(String packageName) {
+    public LayoutRetriever(String packageName) {
         this.packageName = packageName;
         this.resLayoutClassName = packageName + ".R$layout";
         this.resIdClassName = packageName + ".R$id";
@@ -39,8 +39,7 @@ public class LayoutRetriever extends BodyTransformer {
         for (Integer k : validLayoutValueList) {
             if (layoutIdMap.containsKey(k)) {
                 fileNames.add(layoutIdMap.get(k));
-            }
-            else {
+            } else {
                 logger.info("[TODO] Unhandled layout id exception.");
             }
         }
@@ -96,23 +95,19 @@ public class LayoutRetriever extends BodyTransformer {
                                         Value arg = invokeExpr.getArg(0);
                                         if (arg.getClass() == IntConstant.class) {
                                             validLayoutValueList.add(((IntConstant) arg).value);
-                                        }
-                                        else {
+                                        } else {
 //                                            System.out.println("[TODO] unhandled setContentView(int)");
                                             // TODO
                                         }
-                                    }
-                                    else {
+                                    } else {
 //                                        System.out.println("[TODO] unhandled setContentView(View)");
                                         // TODO: setContentView(View)
                                     }
-                                }
-                                else {
+                                } else {
 //                                    System.out.println("[TODO] unhandled void setContentView(android.view.View,android.view.ViewGroup$LayoutParams)");
                                     // TODO: setContentView(android.view.View,android.view.ViewGroup$LayoutParams)
                                 }
-                            }
-                            else if (invokeMethod.getName().equals("inflate")) {
+                            } else if (invokeMethod.getName().equals("inflate")) {
 //                                System.out.println("[TODO] unhandled inflate");
                                 // TODO
                             }

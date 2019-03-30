@@ -4,7 +4,9 @@ import org.apache.commons.cli.ParseException;
 import soot.PackManager;
 import soot.Transform;
 import soot.options.Options;
+import utils.Dom4jParser;
 import utils.ExtendedDefaultParser;
+import utils.LayoutRetriever;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,7 +69,9 @@ public class Main {
                         parser.parse();
                         List<String> tokens = parser.getTokens();
 
-                        if (tokens.size() > 5) {
+                        if (tokens.size() > 0 && (tokens.contains("Toolbar") || tokens.contains("Button") || tokens.contains("TextView") ||
+                                tokens.contains("ImageView") || tokens.contains("EditText") || tokens.contains("CheckBox") ||
+                                tokens.contains("RadioButton") || tokens.contains("Switch") || tokens.contains("List"))) {
                             boolean isLayout = fileNameLower.contains("fragment") || fileNameLower.contains("activity");
                             boolean isListItem = fileNameLower.startsWith("item_") || fileNameLower.endsWith("_item.xml") || fileNameLower.contains("_item_") ||
                                     fileNameLower.startsWith("row_") || fileNameLower.endsWith("_row.xml") || fileNameLower.contains("_row_") ||

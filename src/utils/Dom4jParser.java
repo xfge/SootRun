@@ -1,3 +1,5 @@
+package utils;
+
 import model.LayoutTreeNode;
 import model.Widget;
 import org.dom4j.Attribute;
@@ -13,7 +15,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-class Dom4jParser {
+public class Dom4jParser {
 
     private Logger logger = Logger.getLogger(Dom4jParser.class.toString());
 

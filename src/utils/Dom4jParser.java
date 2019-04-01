@@ -275,11 +275,11 @@ public class Dom4jParser {
         }
 
         if (ancestors != null) {
-            if (ancestors.contains("android.view.ViewGroup")) {
-                return Widget.Layout;
-            }
             if (ancestors.contains("android.widget.AbsListView")) {
                 return Widget.List;
+            }
+            if (ancestors.contains("android.view.ViewGroup")) {
+                return Widget.Layout;
             }
         }
 

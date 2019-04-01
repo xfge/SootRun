@@ -134,13 +134,15 @@ public class Dom4jParser {
             }
         } else if (element.getName().equals("view")) {
             logger.info("[TODO] Unhandled attribute of <view> tag.");
-        } else if (element.getName().equals("merge")) {
-            logger.info("[TODO] Unhandled attribute of <merge> tag.");
         } else if (element.getName().equals("fragment")) {
             logger.info("[TODO] Unhandled attribute of <fragment> tag.");
         } else {
             LayoutTreeNode currentNode = new LayoutTreeNode();
-            currentNode.setClassName(inferClassName(element.getName()));
+            if (element.getName().equals("merge")) {
+                currentNode.setClassName("RelativeLayout");
+            } else {
+                currentNode.setClassName(inferClassName(element.getName()));
+            }
 
             // 获取控件 ID
             Attribute idAttribute = element.attribute("id");

@@ -4,7 +4,6 @@ import org.apache.commons.cli.ParseException;
 import soot.options.Options;
 import utils.Dom4jParser;
 import utils.ExtendedDefaultParser;
-import utils.LayoutRetriever;
 
 import java.io.File;
 import java.io.IOException;
@@ -124,7 +123,7 @@ public class Main {
         writeTokensFile(apktool_dir + File.separator + "res" + File.separator + "layout",
                 token_files_dir + File.separator + package_name + "-layout.lst");
         long endTime = System.currentTimeMillis();
-        System.out.println("Writing files time：" + (endTime - startTime) + "ms");
+        System.out.println("Writing files time: " + (endTime - startTime) + "ms");
 
     }
 

@@ -74,7 +74,8 @@ public class Main {
                                     fileNameLower.startsWith("row_") || fileNameLower.endsWith("_row.xml") || fileNameLower.contains("_row_") ||
                                     fileNameLower.startsWith("card_") || fileNameLower.endsWith("_card.xml") || fileNameLower.contains("_card_") ||
                                     fileNameLower.startsWith("cardview_") || fileNameLower.endsWith("_cardview.xml") || fileNameLower.contains("_cardview_") ||
-                                    fileNameLower.startsWith("listitem_") || fileNameLower.endsWith("_listitem.xml") || fileNameLower.contains("_listitem_");
+                                    fileNameLower.startsWith("listitem_") || fileNameLower.endsWith("_listitem.xml") || fileNameLower.contains("_listitem_") ||
+                                    fileNameLower.startsWith("listrow_") || fileNameLower.endsWith("_listrow.xml") || fileNameLower.contains("_listrow_");
                             boolean shouldExclude = fileNameLower.startsWith("abc_") || fileNameLower.startsWith("preference_") || fileNameLower.startsWith("notification_") ||
                                     fileNameLower.startsWith("date_picker_") || fileNameLower.startsWith("time_picker_") || fileNameLower.startsWith("select_dialog_") ||
                                     fileNameLower.startsWith("support_simple_spinner_dropdown_item");

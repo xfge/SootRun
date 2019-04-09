@@ -82,9 +82,9 @@ public class Main {
 
                             if (!shouldExclude) {
                                 if (isListItem) {
-                                    itemsb.append(package_name).append(" 2 ").append(fileName).append(" ").append(String.join(" ", tokens)).append("\n");
+                                    itemsb.append(package_name).append(" 2 ").append(tokens.size()).append(" ").append(fileName).append(" ").append(String.join(" ", tokens)).append("\n");
                                 } else if (isLayout) {
-                                    layoutsb.append(package_name).append(" 1 ").append(fileName).append(" ").append(String.join(" ", tokens)).append("\n");
+                                    layoutsb.append(package_name).append(" 1 ").append(tokens.size()).append(" ").append(fileName).append(" ").append(String.join(" ", tokens)).append("\n");
                                 }
                             }
                         }

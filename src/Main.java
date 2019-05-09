@@ -82,9 +82,9 @@ public class Main {
 
                             if (!shouldExclude) {
                                 if (isListItem) {
-                                    itemsb.append(package_name).append(" 2 ").append(tokens.size()).append(" ").append(fileName).append(" ").append(String.join(" ", tokens)).append("\n");
+                                    itemsb.append("2 ").append(fileName).append(" ").append(String.join(" ", tokens)).append("\n");
                                 } else if (isLayout) {
-                                    layoutsb.append(package_name).append(" 1 ").append(tokens.size()).append(" ").append(fileName).append(" ").append(String.join(" ", tokens)).append("\n");
+                                    layoutsb.append("1 ").append(fileName).append(" ").append(String.join(" ", tokens)).append("\n");
                                 }
                             }
                         }
@@ -122,7 +122,7 @@ public class Main {
 
         long startTime = System.currentTimeMillis();
         writeTokensFile(apktool_dir + File.separator + "res" + File.separator + "layout",
-                token_files_dir + File.separator + package_name + "-layout.lst");
+                token_files_dir + File.separator + package_name + "-layout.tmp.lst");
         long endTime = System.currentTimeMillis();
         System.out.println("Writing files time: " + (endTime - startTime) + "ms");
 
